@@ -10,11 +10,13 @@ class Celestial:
   def __init__(self,
                mass:float,                            # [kg]
                pos:Tuple[float,float,float],          # [km]
-               ang_vel:float):     # [rad/s]
+               ang_vel:float,                         # [rad/s]
+               radius:float):                         # [km]
     self.mass = mass
     self.x,self.y,self.z = pos
     self.w = ang_vel
     self.X0 = None
+    self.radius = radius
 
 class JWST:
   def __init__(self,
@@ -52,15 +54,15 @@ class ThreeBodySystem:
                m_Sun:float = 1.98847e30,
                m_Earth:float = 5.9722e24,
                m_JWST:float = 6500,
-               Period:float = 31556926,   # Angular Velocity in rad/s of the rotating frame [rad/s] 
-               r_12:float = 1.495978707e8):          # Earth-Sun mean distance [km]
+               Period:float = 31556926,           # Seconds per year [rad/s] 
+               r_12:float = 1.49597871e8):          # Earth-Sun mean distance [km]
     self.G = 6.674e-20                            # Gravitational constant [km^3/kg/s^2]
     self.m_Sun = m_Sun
     self.m_Earth = m_Earth                        # Characteristic Mass in [kg]
     self.M = m_Earth + m_Sun
     self.mu = self.G*self.M
-    self.pi_1 = m_Sun / (m_Earth + m_Sun)
-    self.pi_2 = m_Earth / (m_Earth + m_Sun)
+    self.pi_2 = 3.0542e-6                         # m_Sun / (m_Earth + m_Sun)
+    self.pi_1 = 1 - self.pi_2                     # m_Earth / (m_Earth + m_Sun)
     self.Period = Period
     self.Omega = 2 * pi / Period
     self.r_12 = r_12                              # Characteristic Length in [km]
@@ -70,10 +72,10 @@ class ThreeBodySystem:
     self.w_Earth = 7.292115e-5                     # Earth's Rotation speed in rad/s in  ECEF
     self.n = 1.991e-7                              # rad/s mean motion of the Sun-Earth line in Ecliptic
     self.x_L2 = 1.01009044
-    
+
     # Instantiate 3 bodies as components
-    self.Sun = Celestial(mass = m_Sun, pos = (-self.pi_2 ,0,0), ang_vel = 0)
-    self.Earth = Celestial(mass = m_Earth, pos = (self.pi_1 ,0,0), ang_vel = self.w_Earth)
+    self.Sun = Celestial(mass = m_Sun, pos = (-self.pi_2 ,0,0), ang_vel = 0, radius=695700)
+    self.Earth = Celestial(mass = m_Earth, pos = (self.pi_1 ,0,0), ang_vel = self.w_Earth, radius=6378)
     self.JamesWebb = JWST(mass = m_JWST, pos = (self.Earth.x + 2000000/r_12,0,0))
 
   @staticmethod
