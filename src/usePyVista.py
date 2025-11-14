@@ -1,0 +1,125 @@
+# PYVISTA FOR VISUALIZATION
+
+import numpy as np
+import pyvista as pv
+from vtkmodules.vtkRenderingCore import vtkAssembly
+
+def jwstVisualizationFixed(x_fixed, y_fixed, z_fixed, x_Earth, y_Earth, z_Earth, r_12, number_of_years, 
+                         jwstModelPath="./assets/models/JWST/scene.gltf", cubeMapPath='./assets/cubemaps'):
+    pv.global_theme.allow_empty_mesh = True
+
+    num_stars = 40000
+    spaceRadius = 10 * r_12
+    starsCords = np.random.uniform(-spaceRadius, spaceRadius, size=(num_stars, 3))
+    starPoints = pv.PolyData(starsCords)
+
+    jwstOrbit = pv.PolyData()
+    jwstSamples = len(x_fixed)
+
+    earthOrbit = pv.PolyData()
+    earthSamples = len(x_Earth)
+
+    # REASONABLE SCALE FOR RADIUS BUT NOT IN SCALE
+
+    sunRad = 0.1 * r_12
+    earthRad = 0.05 * r_12
+
+    sun = pv.Sphere(radius = sunRad, center = (0, 0, 0))
+    earth = pv.Sphere(radius = earthRad * 0.3, center = (0, 0, 0))
+
+    pl = pv.Plotter(window_size=[3000, 2700])
+    pl.set_background('black')
+
+    pl.import_gltf(jwstModelPath, set_camera = False)
+    actors = pl.renderer.GetActors()
+    actors.InitTraversal()
+    jwstActors = []
+    for _ in range(actors.GetNumberOfItems()):
+        actor = actors.GetNextActor()
+        jwstActors.append(actor)
+    jwstAssembly = vtkAssembly()
+    for actor in jwstActors:
+        jwstAssembly.AddPart(actor)
+
+    jwstAssembly.SetScale(0.001 * r_12)
+
+    envTex = pv.cubemap(cubeMapPath, 'space-', '.png')
+    pl.set_environment_texture(envTex)
+
+    pl.add_mesh(jwstOrbit, color = 'cyan', line_width = 2, label = 'JWST Orbit')
+    pl.add_mesh(earthOrbit, color = 'blue', line_width = 1, label = 'Earth Orbit')
+
+    pl.add_mesh(sun, color='yellow', label='Sun')
+    earthActor = pl.add_mesh(earth, color='deepskyblue', label='Earth')
+
+    pl.add_mesh(starPoints, color='white', point_size=2 , render_points_as_spheres=True)
+
+    light = pv.Light(
+        position=(1, 1, 1),  
+        positional=True,                   
+        color='white',
+        intensity=10.0,
+        focal_point=(0, 0, 0)
+    )
+    pl.add_light(light)
+    pl.renderer.ResetCameraClippingRange()
+
+    pl.add_legend(bcolor=None, face=None, border=False, )
+    pl.add_text(f"JWST Halo Orbit ({number_of_years} Years) - Fixed Frame",
+                    position='upper_left', font_size=12, color='white')
+    pl.add_actor(jwstAssembly)
+
+    pl.add_axes()
+
+    def callback(frame):
+        earthPos = np.array([x_Earth[frame], y_Earth[frame], z_Earth[frame]])
+        vecNorm = earthPos / np.linalg.norm(earthPos)
+        cameraDistance = 1 * r_12
+        cameraPos = earthPos + cameraDistance * vecNorm
+
+        heightOffset = 0.5 * r_12
+        cameraPos[2] += heightOffset
+
+        freq = 2 * np.pi / 500
+        phase = frame * freq
+
+        up = np.array([0, 0, 1])
+        right = np.cross(vecNorm, up)
+        right /= np.linalg.norm(right)
+        
+        forward = np.cross(right, vecNorm)
+        
+        cameraPos += earthRad * 0.3 * np.sin(phase) * right
+        cameraPos += earthRad * 0.3 * np.cos(phase) * forward
+
+        cam = pl.renderer.GetActiveCamera()
+        cam.SetPosition(*cameraPos)     
+        cam.SetFocalPoint(0, 0, 0)    
+        pl.renderer.ResetCameraClippingRange()
+
+        lag = max(0, frame-200)
+        xs = x_fixed[lag:frame]
+        ys = y_fixed[lag:frame]
+        zs = z_fixed[lag:frame]
+        jwstOrbit.points = np.column_stack((xs, ys, zs))
+        n = len(xs)
+        if n > 1:
+            lines = np.arange(0, n)
+            lines = np.insert(lines, 0, n)
+            jwstOrbit.lines = lines
+
+        earthOrbit.points = np.column_stack((x_Earth[lag:frame], y_Earth[lag:frame], z_Earth[lag:frame]))
+        nE = len(x_Earth[lag:frame])
+        if nE > 1:
+            lines = np.arange(0, nE)
+            lines = np.insert(lines, 0, nE)
+            earthOrbit.lines = lines
+
+        jwstAssembly.SetPosition(x_fixed[frame], y_fixed[frame], z_fixed[frame])
+        earthActor.position = [x_Earth[frame], y_Earth[frame], z_Earth[frame]]
+
+        pl.render()
+
+    pl.add_timer_event(max_steps=jwstSamples, duration=500, callback=callback)
+
+    pl.show()
