@@ -13,8 +13,16 @@
     <section>
         <h1>Halo Orbit Simulation of JWST at L2</h1>
         <p>Numerical simulation and visualization of JWST's transfer and halo orbit near L2. Explore trajectories, frames, and 3D context in a lightweight gallery.</p>
+        
+        <!-- Team members -->
+        <div class="team-block">
+        <h3>Team 15</h3>
+        <span class="team-names">
+            Tianyang Hu · Mark Zhang · Haoran Yan · Shiqi Fan
+        </span>
+        </div>
 
-        <!-- Media gallery -->
+        <!-- JWST -->
         <div class="media-wide">
         <figure class="card wide">
             <video
@@ -31,35 +39,57 @@
             </figcaption>
         </figure>
         
-        <div class="media-grid">
-            <figure class="card">
-                <video
-                    class="media"
-                    src="../results/animation/jwst_ff.mp4"
-                    autoplay
-                    muted
-                    loop
-                    playsinline
-                ></video>
-                <figcaption class="caption">
-                    <strong>Transfer (Fixed/Inertial Frame)</strong> — JWST's Earth→L₂ transfer trajectory displayed in the inertial frame, where both the Earth's revolution and JWST's path are visible. This view highlights the spacecraft's true motion relative to the Sun-Earth system.
-                </figcaption>
+        <!-- Row 1: Fixed/Inertial Frame — video LEFT, text RIGHT -->
+        <div class="split-row">
+        <div class="split-card">
+            <figure class="split-media">
+            <video
+                class="media"
+                src="../results/animation/jwst_ff.mp4"
+                autoplay muted loop playsinline
+            ></video>
+            <figcaption class="sr-only">
+                Transfer (Fixed/Inertial Frame) — JWST Earth→L₂ trajectory in the inertial frame.
+            </figcaption>
             </figure>
 
-            <figure class="card">
-                <video
-                    class="media"
-                    src="../results/animation/jwst_rf.mp4"
-                    autoplay
-                    muted
-                    loop
-                    playsinline
-                ></video>
-                <figcaption class="caption">
-                    <strong>Transfer and Halo Context (Rotating Frame)</strong> — JWST's trajectory shown in the Sun-Earth rotating frame, centered near L2. The apparent stationary Earth and Sun make it easier to observe the halo orbit structure and JWST's gradual stabilization near L2.
-                </figcaption>
+            <div class="split-copy">
+            <h3>Transfer (Fixed/Inertial Frame)</h3>
+            <p>
+                JWST's Earth→L₂ trajectory shown in the inertial frame, where both Earth's
+                revolution and the spacecraft's path are visible. This view highlights the
+                absolute geometry of the transfer relative to the Sun-Earth system.
+            </p>
+            </div>
+        </div>
+        </div>
+
+        <!-- Row 2: Rotating Frame — text LEFT, video RIGHT -->
+        <div class="split-row alt">
+        <div class="split-card">
+            <div class="split-copy">
+            <h3>Transfer &amp; Halo Context (Rotating Frame)</h3>
+            <p>
+                JWST's trajectory rendered in the Sun-Earth rotating frame, centered near L₂.
+                With the bulk orbital motion removed, the approach to L₂ and halo dynamics
+                become clearer.
+            </p>
+            </div>
+
+            <figure class="split-media">
+            <video
+                class="media"
+                src="../results/animation/jwst_rf.mp4"
+                autoplay muted loop playsinline
+            ></video>
+            <figcaption class="sr-only">
+                Rotating frame view centered near L₂, clarifying halo dynamics.
+            </figcaption>
             </figure>
         </div>
+        </div>
+
+
       </div>
 
     </section>

@@ -35,6 +35,9 @@ requirements.txt      # Python dependencies
 ---
 
 ## How to run
+
+### 1. Reproduce simulations and animations
+
 1. Install dependencies:
 ```bash
 pip install -r requirements.txt
@@ -46,6 +49,18 @@ python main.py
 ```
 This will run the nonlinear propagation (via `control.nlsys` + `ct.input_output_response`), produce rotating-frame plots and fixed-frame animations, and optionally launch the PyVista viewer if `usePyVista.jwstVisualizationFixed` is called.
 
+
+### 2. Run the visualization UI
+
+1. From the project root, start a simple HTTP server:
+```bash
+python3 -m http.server 8000
+```
+
+2. Open a browser and go to:
+```bash
+http://localhost:8000/ui/
+```
 ---
 
 ## Notes
