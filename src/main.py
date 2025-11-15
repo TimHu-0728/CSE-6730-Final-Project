@@ -6,6 +6,9 @@ from scipy.spatial.transform import Rotation as Rot
 import plotTraj
 from classes import *
 from usePyVista import jwstVisualizationFixed 
+from pathlib import Path
+
+OUTPUT_DIR = Path("results/animation"); OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 # Instantiate Three body system and its compositions. 
 TB = ThreeBodySystem()
@@ -37,7 +40,7 @@ JWST_IO = ct.nlsys(TB.JamesWebb.JWST_update_nondim, TB.JamesWebb.JWST_output,
                     params=JWST_params)
 
 # Simulation
-number_of_years = 20
+number_of_years = 2
 timepts_year = 1000
 timepts = np.linspace(0,number_of_years*TB.year,number_of_years*timepts_year)       # Nondimensinal time points
 u = [np.zeros_like(timepts),np.zeros_like(timepts),np.zeros_like(timepts)]
@@ -55,8 +58,8 @@ zdot = TB.V_C * outputs['zdot']
 t = TB.t_C * time
 
 # Plot the JWST Trajectory
-plotTraj.Plot_static_RF(x,y,z,t,TB.r_12,TB.x_L2,TB.Earth.x)
-plotTraj.Animation_RF(x,y,z,t,TB.r_12,TB.x_L2,TB.Earth.x)
+plotTraj.Plot_static_RF(x,y,z,t,TB.r_12,TB.x_L2,TB.Earth.x, save_path=OUTPUT_DIR / "jwst_rf_static.png")
+plotTraj.Animation_RF(x,y,z,t,TB.r_12,TB.x_L2,TB.Earth.x, save_path=OUTPUT_DIR / "jwst_rf.mp4", fps=30, dpi=200)
 
 # Transfer to Fixed Frame
 XYZ = TB.RotToFixed(np.array([x,y,z]).T, TB.Omega, t)
@@ -67,8 +70,9 @@ x_Earth = 0.97*TB.r_12*np.cos(TB.Omega*t)
 y_Earth = 0.97*TB.r_12*np.sin(TB.Omega*t)
 z_Earth = np.zeros_like(x_Earth)
 
-plotTraj.Animation_FF(x_fixed,y_fixed,z_fixed,x_Earth,y_Earth,z_Earth,t,TB.r_12)
+plotTraj.Animation_FF(x_fixed,y_fixed,z_fixed,x_Earth,y_Earth,z_Earth,t,TB.r_12, save_path=OUTPUT_DIR / "jwst_ff.mp4", fps=30, dpi=200)
 
 # PYVISTA FOR VISUALIZATION
 jwstVisualizationFixed(x_fixed, y_fixed, z_fixed, x_Earth, y_Earth, z_Earth, TB.r_12, number_of_years, 
-                         jwstModelPath="./assets/models/JWST/scene.gltf", cubeMapPath='./assets/cubemaps')
+                         jwstModelPath="./assets/models/JWST/scene.gltf", cubeMapPath='./assets/cubemaps/space',
+                         save_movie=OUTPUT_DIR / "jwst_pv_fixed.mp4")

@@ -3,9 +3,12 @@
 import numpy as np
 import pyvista as pv
 from vtkmodules.vtkRenderingCore import vtkAssembly
+import subprocess, shutil
+from pathlib import Path
 
 def jwstVisualizationFixed(x_fixed, y_fixed, z_fixed, x_Earth, y_Earth, z_Earth, r_12, number_of_years, 
-                         jwstModelPath="./assets/models/JWST/scene.gltf", cubeMapPath='./assets/cubemaps'):
+                         jwstModelPath="./assets/models/JWST/scene.gltf", cubeMapPath='./assets/cubemaps',
+                         save_movie=None, framerate=30, step=5, window_size=(1280, 720)):
     pv.global_theme.allow_empty_mesh = True
 
     num_stars = 40000
@@ -27,7 +30,8 @@ def jwstVisualizationFixed(x_fixed, y_fixed, z_fixed, x_Earth, y_Earth, z_Earth,
     sun = pv.Sphere(radius = sunRad, center = (0, 0, 0))
     earth = pv.Sphere(radius = earthRad * 0.3, center = (0, 0, 0))
 
-    pl = pv.Plotter(window_size=[3000, 2700])
+    off = bool(save_movie)
+    pl = pv.Plotter(window_size=window_size if save_movie else [3000, 2700], off_screen=off)
     pl.set_background('black')
 
     pl.import_gltf(jwstModelPath, set_camera = False)
@@ -119,7 +123,47 @@ def jwstVisualizationFixed(x_fixed, y_fixed, z_fixed, x_Earth, y_Earth, z_Earth,
         earthActor.position = [x_Earth[frame], y_Earth[frame], z_Earth[frame]]
 
         pl.render()
+    
+    if save_movie:
+        out = Path(save_movie)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        tmp_dir = out.parent / (out.stem + "_frames")
+        tmp_dir.mkdir(parents=True, exist_ok=True)
 
-    pl.add_timer_event(max_steps=jwstSamples, duration=500, callback=callback)
+        # ensure ffmpeg exists
+        assert shutil.which("ffmpeg"), "ffmpeg not found on PATH"
 
-    pl.show()
+        # off-screen render for consistent frames
+        pl.off_screen = True
+        pl.window_size = window_size
+
+        frame_ids = range(0, jwstSamples, max(1, step))
+        for k, frame in enumerate(frame_ids):
+            callback(frame)  # your existing update logic
+            pl.render()
+            # save PNG frame_000000.png, frame_000001.png, ...
+            pl.screenshot(filename=str(tmp_dir / f"frame_{k:06d}.png"),
+                        return_img=False, window_size=window_size)
+
+        pl.close()
+
+        # stitch PNGs -> MP4 (QuickTime-friendly)
+        cmd = [
+            "ffmpeg",
+            "-y",
+            "-framerate", str(framerate),
+            "-i", str(tmp_dir / "frame_%06d.png"),
+            "-vcodec", "libx264",
+            "-pix_fmt", "yuv420p",
+            "-movflags", "+faststart",
+            str(out)
+        ]
+        subprocess.run(cmd, check=True)
+
+        # optional: clean up frames
+        for p in tmp_dir.glob("frame_*.png"):
+            p.unlink()
+        tmp_dir.rmdir()
+    else:
+        pl.add_timer_event(max_steps=jwstSamples, duration=500, callback=callback)
+        pl.show()

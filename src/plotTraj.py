@@ -4,9 +4,66 @@ from matplotlib.animation import PillowWriter
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 
+# --- at top of plotTraj.py (keep your existing imports) ---
+import os
+from pathlib import Path
+from matplotlib import animation
+
+# Helper: save animation or show interactively
+def _save_or_show(fig, anim=None, save_path=None, fps=30, dpi=200, bitrate=2400):
+    if save_path is None:
+        # interactive
+        plt.show()
+        return
+    save_path = Path(save_path)
+    save_path.parent.mkdir(parents=True, exist_ok=True)
+    suffix = save_path.suffix.lower()
+
+    if anim is None:
+        # static figure
+        fig.savefig(save_path, dpi=dpi, bbox_inches="tight")
+        plt.close(fig)
+        return
+
+    # animated figure
+    if suffix == ".mp4":
+        # use ffmpeg if available
+        if animation.writers.is_available("ffmpeg"):
+            Writer = animation.writers["ffmpeg"]
+            writer = Writer(
+              fps=fps, 
+              codec="libx264",
+              bitrate=bitrate,
+              extra_args=["-pix_fmt", "yuv420p", "-movflags", "faststart"]
+            )
+            anim.save(str(save_path), writer=writer, dpi=dpi)
+        else:
+            # fallback to GIF if ffmpeg is missing
+            gif_path = save_path.with_suffix(".gif")
+            anim.save(str(gif_path), writer=PillowWriter(fps=fps))
+        plt.close(fig)
+    elif suffix in {".gif", ".apng"}:
+        anim.save(str(save_path), writer=PillowWriter(fps=fps))
+        plt.close(fig)
+    else:
+        # default: treat as PNG for static, or MP4 for animated
+        if suffix in {".png", ".jpg", ".jpeg", ".svg", ".pdf"}:
+            fig.savefig(save_path, dpi=dpi, bbox_inches="tight")
+            plt.close(fig)
+        else:
+            # unknown extension -> try mp4
+            if animation.writers.is_available("ffmpeg"):
+                Writer = animation.writers["ffmpeg"]
+                writer = Writer(fps=fps, metadata={"artist": "CSE6730"}, bitrate=bitrate)
+                anim.save(str(save_path.with_suffix(".mp4")), writer=writer, dpi=dpi)
+            else:
+                anim.save(str(save_path.with_suffix(".gif")), writer=PillowWriter(fps=fps))
+            plt.close(fig)
+
+
 
 # Animate trajectory in Rotation frame around L2
-def Animation_RF(x,y,z,t,r_12,x_L2,x_Earth):
+def Animation_RF(x,y,z,t,r_12,x_L2,x_Earth, save_path=None, fps=30, dpi=200):
   fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
   ax.axis('equal')
   Traj = ax.plot([], [], [], 'r-', label='Halo Orbit',lw=1)[0]
@@ -29,11 +86,12 @@ def Animation_RF(x,y,z,t,r_12,x_L2,x_Earth):
 
   ani = FuncAnimation(fig=fig,func=update,frames=len(t),interval=0.1,blit=False,repeat=False)
   # ani.save('Animation_Rotation_Frame.gif',writer=PillowWriter(fps=100))
+  _save_or_show(fig, ani, save_path=save_path, fps=fps, dpi=dpi)
   plt.show()
   
 
 # Plot the Earth with Halo Orbits Rotation frame
-def Plot_static_RF(x,y,z,t,r_12,x_L2,x_Earth):
+def Plot_static_RF(x,y,z,t,r_12,x_L2,x_Earth, save_path=None, dpi=200):
   fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
   ax.axis('equal')
   ax.set_title('JWST Trajectory in Rotating Frame (CR3BP)')
@@ -50,10 +108,11 @@ def Plot_static_RF(x,y,z,t,r_12,x_L2,x_Earth):
 
   plt.legend()
   # plt.savefig('Halo_Orbit.jpg')
+  _save_or_show(fig, anim=None, save_path=save_path, dpi=dpi)
   plt.show()
 
 # Animation trajectory in Fixed frame
-def Animation_FF(x_JWST,y_JWST,z_JWST,x_Earth,y_Earth,z_Earth,t,r_12):
+def Animation_FF(x_JWST,y_JWST,z_JWST,x_Earth,y_Earth,z_Earth,t,r_12,save_path=None, fps=30, dpi=200):
   fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
   ax.axis('equal')
   Traj_JWST = ax.plot([], [], [], 'r-', label='Halo Orbit',lw=1)[0]
@@ -81,6 +140,7 @@ def Animation_FF(x_JWST,y_JWST,z_JWST,x_Earth,y_Earth,z_Earth,t,r_12):
 
   ani = FuncAnimation(fig=fig,func=update,frames=len(t),interval=0.1,blit=False,repeat=False)
   # ani.save('Animation_Fixed_Frame.gif',writer=PillowWriter(fps=100))
+  _save_or_show(fig, ani, save_path=save_path, fps=fps, dpi=dpi)
   plt.show()
   
   
