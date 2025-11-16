@@ -1,6 +1,6 @@
 # JWST Halo Orbit Simulation
 
-This repository contains the code for my **CSE 6730 (Modeling & Simulation)** course project. The goal is to model and simulate the motion of the **James Webb Space Telescope (JWST)** in the Earth–Sun Circular Restricted Three-Body Problem (CR3BP) and visualize its halo orbit around the L2 point.
+This repository contains the code for the **CSE 6730 – Modeling & Simulation** course project. The goal is to model and simulate the motion of the **James Webb Space Telescope (JWST)** in the Earth–Sun Circular Restricted Three-Body Problem (CR3BP) and to visualize its halo orbit around the L2 point, along with the supporting 3D animations and web-based video gallery.
 
 ---
 
@@ -70,12 +70,14 @@ CSE-6730-FINAL-PROJECT/
 
 ### 1. Reproduce simulations and animations
 
-1. Install dependencies:
+#### Step 1. Install dependencies:
+
 ```bash
 pip install -r requirements.txt
 ```
 
-2. Run the main script:
+#### Step 2. Run the main script:
+
 ```bash
 cd src
 python main.py
@@ -87,18 +89,16 @@ This will:
 - Generate rotating-frame and fixed-frame plots/animations,
 - Save the resulting `.mp4` files and figures under `../results/`
   (e.g., `results/animation/`, `results/figures/`),
-  
-You can rerun `main.py` after changing initial conditions or visualization settings to regenerate outputs.
 
 ### 2. Run the visualization UI
 
-1. From the project root `CSE-6730-FINAL-PROJECT/`, start a simple HTTP server:
+#### Step 1. From the project root `CSE-6730-FINAL-PROJECT/`, start a simple HTTP server:
 
 ```bash
 python3 -m http.server 8000
 ```
 
-2. Open a browser and go to:
+#### Step 2. Open a browser and go to:
 
 ```bash
 http://localhost:8000/ui/
@@ -106,14 +106,3 @@ http://localhost:8000/ui/
 The UI will load `.mp4` animations from the `results/` directory and present them as a simple video gallery. Refresh the page after rerunning simulations to see newly generated videos.
 
 ---
-
-## Notes
-- Two initial-condition vectors are included in `main.py`: one for a stable halo orbit and one for an unstable halo orbit.
-- Numerical integration uses `solve_ivp` (RK45) with tight tolerances in the simulation call.
-- The PyVista visualization is not to-scale for the spacecraft and planetary radii (scaled for visual clarity).
-- Intended as the final project for Georgia Tech's CSE 6730 course.
-
----
-
-*Note: This markdown was written with assistance from AI resources.*
-
