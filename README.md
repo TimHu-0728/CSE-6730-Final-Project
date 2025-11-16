@@ -115,5 +115,12 @@ The UI will load `.mp4` animations from the `results/` directory and present the
 
 ---
 
+### JWST Halo Orbit – Fixed Frame
+![Fixed Frame](results/animation/jwst_ff.gif)
+
+### JWST Halo Orbit – Rotating Frame
+![Rotating Frame](results/animation/jwst_rf.gif)
+
 *Note: This markdown was written with assistance from AI resources.*
+
 
