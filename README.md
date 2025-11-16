@@ -106,3 +106,19 @@ http://localhost:8000/ui/
 The UI will load `.mp4` animations from the `results/` directory and present them as a simple video gallery. Refresh the page after rerunning simulations to see newly generated videos.
 
 ---
+
+## Notes
+- Two initial-condition vectors are included in `main.py`: one for a stable halo orbit and one for an unstable halo orbit.
+- Numerical integration uses `solve_ivp` (RK45) with tight tolerances in the simulation call.
+- The PyVista visualization is not to-scale for the spacecraft and planetary radii (scaled for visual clarity).
+- Intended as the final project for Georgia Tech's CSE 6730 course.
+
+---
+
+### JWST Halo Orbit – Fixed Frame
+![Fixed Frame](results/animation/jwst_ff.gif)
+
+### JWST Halo Orbit – Rotating Frame
+![Rotating Frame](results/animation/jwst_rf.gif)
+
+*Note: This markdown was written with assistance from AI resources.*
