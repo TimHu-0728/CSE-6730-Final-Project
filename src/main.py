@@ -190,16 +190,16 @@ y_LEO = TB.r_12*outputs_LEO['y']
 z_LEO = TB.r_12*outputs_LEO['z']
 t_LEO = TB.t_C*time_LEO
 
-plotTraj.Plot_static_RF(
-    x_LEO,y_LEO,z_LEO,t_LEO,TB.r_12,TB.x_L2,TB.Earth.x,
-    save_path=OUTPUT_DIR / "leo_rf_static.png"
-)
+# plotTraj.Plot_static_RF(
+#     x_LEO,y_LEO,z_LEO,t_LEO,TB.r_12,TB.x_L2,TB.Earth.x,
+#     save_path=OUTPUT_DIR / "leo_rf_static.png"
+# )
 
-plotTraj.Animation_RF(
-    x_LEO,y_LEO,z_LEO,t_LEO,TB.r_12,TB.x_L2,TB.Earth.x,
-    save_path=OUTPUT_DIR / "leo_rf.mp4",
-    fps=30, dpi=200
-)
+# plotTraj.Animation_RF(
+#     x_LEO,y_LEO,z_LEO,t_LEO,TB.r_12,TB.x_L2,TB.Earth.x,
+#     save_path=OUTPUT_DIR / "leo_rf.mp4",
+#     fps=30, dpi=200
+# )
 
 XYZ_LEO = TB.RotToFixed(np.array([x_LEO,y_LEO,z_LEO]).T, TB.Omega, t_LEO)
 x_LEO_fixed = XYZ_LEO[:,0]
@@ -210,20 +210,35 @@ x_Earth_LEO = 0.97*TB.r_12*np.cos(TB.Omega*t_LEO)
 y_Earth_LEO = 0.97*TB.r_12*np.sin(TB.Omega*t_LEO)
 z_Earth_LEO = np.zeros_like(x_Earth_LEO)
 
-plotTraj.Animation_FF(
-    x_LEO_fixed,y_LEO_fixed,z_LEO_fixed,
-    x_Earth_LEO,y_Earth_LEO,z_Earth_LEO,
-    t_LEO,TB.r_12,
-    save_path=OUTPUT_DIR / "leo_ff.mp4",
-    fps=30, dpi=200
+# plotTraj.Animation_FF(
+#     x_LEO_fixed,y_LEO_fixed,z_LEO_fixed,
+#     x_Earth_LEO,y_Earth_LEO,z_Earth_LEO,
+#     t_LEO,TB.r_12,
+#     save_path=OUTPUT_DIR / "leo_ff.mp4",
+#     fps=30, dpi=200
+# )
+
+# jwstVisualizationFixed(
+#     x_LEO_fixed, y_LEO_fixed, z_LEO_fixed,
+#     x_Earth_LEO, y_Earth_LEO, z_Earth_LEO,
+#     TB.r_12, 1,
+#     jwstModelPath="./assets/models/JWST/scene.gltf",
+#     cubeMapPath='./assets/cubemaps/space',
+#     save_movie=OUTPUT_DIR / "leo_pv_fixed.mp4",
+#     title="JWST LEO Orbit"
+# )
+
+from validation import validate_jacobi, validate_halo_boundedness
+
+validate_jacobi(
+    TB,
+    outputs,
+    time,
+    save_dir="results/validation"
 )
 
-jwstVisualizationFixed(
-    x_LEO_fixed, y_LEO_fixed, z_LEO_fixed,
-    x_Earth_LEO, y_Earth_LEO, z_Earth_LEO,
-    TB.r_12, 1,
-    jwstModelPath="./assets/models/JWST/scene.gltf",
-    cubeMapPath='./assets/cubemaps/space',
-    save_movie=OUTPUT_DIR / "leo_pv_fixed.mp4",
-    title="JWST LEO Orbit"
+validate_halo_boundedness(
+    TB,
+    x, y, z,
+    save_dir="results/validation"
 )
