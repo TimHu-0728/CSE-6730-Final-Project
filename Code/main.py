@@ -78,14 +78,22 @@ time_Halo, output_Halo, input_Halo = TB.JamesWebb.JWST_propagate(JWST_IO_Earthce
 output_Halo = TB.Earth_centered_inverse(output_Halo)
 x_Halo, y_Halo, z_Halo, xdot_Halo, ydot_Halo, zdot_Halo, t_Halo = TB.Dimensionalize(output_Halo,time_Halo)
 
+# Build a proper time vector for the TO so it matches the states
+t_TO = np.linspace(
+    t_LEO[-1],                   # start right after LEO ends
+    t_LEO[-1] + T_opt*TB.year,   # end after T_opt years (dimensional)
+    len(x_TO)
+)
+
 # Merge the Orbits
 x = np.concatenate((x_LEO,x_TO,x_Halo))
 y = np.concatenate((y_LEO,y_TO,y_Halo))
 z = np.concatenate((z_LEO,z_TO,z_Halo))
+t = np.concatenate((t_LEO,t_TO,t_Halo))
 
 # Plot the JWST Trajectory
-PlotTraj.Plot_static_RF(x,y,z,TB.r_12,TB.x_L2,TB.Earth.x)
-# PlotTraj.Animation_RF(x,y,z,t,TB.r_12,TB.x_L2,TB.Earth.x)
+# PlotTraj.Plot_static_RF(x,y,z,TB.r_12,TB.x_L2,TB.Earth.x)
+PlotTraj.Animation_RF(x,y,z,t,TB.r_12,TB.x_L2,TB.Earth.x)
 
 # Transfer to Fixed Frame
 # XYZ = TB.RotToFixed(np.array([x,y,z]).T, TB.Omega, t)

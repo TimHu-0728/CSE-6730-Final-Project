@@ -3,33 +3,69 @@ from matplotlib.animation import FuncAnimation
 from matplotlib.animation import PillowWriter
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
+from pathlib import Path
+
+from pathlib import Path
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation, PillowWriter, FFMpegWriter
 
 
-# Animate trajectory in Rotation frame around L2
-def Animation_RF(x,y,z,t,r_12,x_L2,x_Earth):
-  fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-  ax.axis('equal')
-  Traj = ax.plot([], [], [], 'r-', label='Halo Orbit',lw=1)[0]
-  Head = ax.scatter([],[],[], c='tab:brown',marker='o',s=1,label='JWST')
-  ax.scatter(x_L2*r_12,0,0,c='tab:purple',marker='*',label='L_2',s=80)
-  ax.scatter(x_Earth*r_12,0,0,c='tab:blue',marker='o',label='Earth',s=1)
-  ax.set_title('JWST Trajectory in Rotating Frame')
-  ax.set_xlabel('x')
-  ax.set_ylabel('y')
-  ax.set_zlabel('z')
-  ax.set_xlim([1.49e8,1.515e8])
-  ax.set_ylim([-1.5e6,1.5e6])
-  ax.set_zlim([-1e6,2e6])
-  ax.legend()
 
-  def update(frame):
-    Traj.set_data_3d(x[:frame],y[:frame],z[:frame])
-    Head._offsets3d = ([x[frame]],[y[frame]],[z[frame]])
-    return Traj, Head,
+def Animation_RF(x, y, z, t, r_12, x_L2, x_Earth):
+    # --- set up figure ---
+    fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
+    ax.axis("equal")
 
-  ani = FuncAnimation(fig=fig,func=update,frames=len(t),interval=0.1,blit=False,repeat=False)
-  # ani.save('Animation_Rotation_Frame.gif',writer=PillowWriter(fps=100))
-  plt.show()
+    traj, = ax.plot([], [], [], "r-", label="Halo Orbit", lw=1)
+    head = ax.scatter([], [], [], c="tab:brown", marker="o", s=4, label="JWST")
+    ax.scatter(x_L2 * r_12, 0, 0, c="tab:purple", marker="*", label="L2", s=80)
+    ax.scatter(x_Earth * r_12, 0, 0, c="tab:blue", marker="o", label="Earth", s=10)
+
+    ax.set_title("JWST Trajectory in Rotating Frame")
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
+    ax.set_zlabel("z")
+    ax.set_xlim([1.49e8, 1.515e8])
+    ax.set_ylim([-1.5e6, 1.5e6])
+    ax.set_zlim([-1e6, 2e6])
+    ax.legend()
+
+    # --- frame selection: at most 800 frames ---
+    n = len(t)
+    max_frames = 800
+    step = max(1, n // max_frames)
+    frame_indices = np.arange(0, n, step)
+
+    def update(frame_idx):
+        i = frame_idx
+        traj.set_data_3d(x[:i], y[:i], z[:i])
+        head._offsets3d = ([x[i]], [y[i]], [z[i]])
+        return traj, head
+
+    ani = FuncAnimation(
+        fig,
+        update,
+        frames=frame_indices,
+        interval=50,      # ms between frames (ignored for GIF, but fine)
+        blit=False,
+        repeat=False,
+    )
+
+    # --- output path: ../results/animation/ ---
+    base_dir = Path(__file__).resolve().parent       # .../Code
+    anim_dir = base_dir.parent / "results" / "animation"
+    anim_dir.mkdir(parents=True, exist_ok=True)
+
+    out_path = anim_dir / "jwst_with_optimization_rotation_frame.mp4"
+    print(f"Saving animation to: {out_path}")
+
+    writer = FFMpegWriter(fps=20, bitrate=1800)
+    ani.save(str(out_path), writer=writer)
+
+    plt.close(fig)   # close figure to free memory
+    print("Done saving animation.")
+
   
 
 # Plot the Earth with Halo Orbits in Rotation frame
