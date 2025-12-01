@@ -3,96 +3,271 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>JWST Demo UI</title>
+  <title>Halo Orbit Simulation of JWST at L2</title>
   <link rel="stylesheet" href="style.css" />
   <script src="app.js" defer></script>
+  <script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']]
+    },
+    svg: { fontCache: 'global' }
+  };
+  </script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+  </script>
+
 </head>
 <body>
   <div class="overlay" aria-hidden="true"></div>
-  <main class="wrap">
-    <section>
-        <h1>Halo Orbit Simulation of JWST at L2</h1>
-        <p>Numerical simulation and visualization of JWST's transfer and halo orbit near L2. Explore trajectories, frames, and 3D context in a lightweight gallery.</p>
-        
-        <!-- Team members -->
-        <div class="team-block">
-        <h3>Team 15</h3>
-        <span class="team-names">
-            Tianyang Hu · Mark Zhang · Haoran Yan · Shiqi Fan
-        </span>
-        </div>
 
-        <!-- JWST -->
-        <div class="media-wide">
-        <figure class="card wide">
-            <video
-                id="pvVideo"
+  <main class="wrap">
+    <!-- 0. Title & team -->
+    <section id="top" class="hero-section">
+      <header class="hero-inner">
+        <h1>Halo Orbit Simulation of JWST at L2</h1>
+        <h3>Group 15</h3>
+        <p>Tianyang Hu · Mark Zhang · Haoran Yan · Shiqi Fan</p>
+      </header>
+    </section>
+
+    <!-- 1+2. Project Description + Conceptual Model (merged) -->
+    <section id="project">
+      <div class="card wide section-card">
+        <div class="project-overview-layout">
+          <!-- LEFT: image -->
+          <div class="project-overview-media">
+            <figure>
+              <img
+                src="imgs/Pillars_of_Creation.png"
+                alt="Pillars of Creation illustration used as a JWST-themed background"
+                class="project-overview-image"
+              />
+            </figure>
+          </div>
+
+          <!-- RIGHT: project paragraph + conceptual bullets -->
+          <div class="project-overview-text">
+            <h2>Project Description</h2>
+            <p>
+              We simulate a JWST-like spacecraft operating near the Sun–Earth L<sub>2</sub>
+              Lagrange point using the Circular Restricted Three-Body Problem. Our project
+              builds an end-to-end pipeline: starting from an Earth parking orbit, we design
+              a transfer to the L<sub>2</sub> region and then propagate a three-dimensional
+              halo orbit in the rotating frame. We validate the dynamics using the Jacobi
+              constant and long-term bounded motion, and we visualize the results with 3D
+              animations in both inertial and rotating frames. The final interface lets
+              viewers quickly grasp how JWST can reach L<sub>2</sub> and maintain a stable
+              halo orbit.
+            </p>
+
+            <br/>
+
+            <h2>Conceptual Model: Sun-Earth CR3BP</h2>
+            <ul class="keypoints">
+                <li>
+                    <strong>CR3BP abstraction:</strong>
+                    reduce the full N-body solar system to two massive primaries (Sun, Earth) and
+                    one massless spacecraft, while preserving Lagrange points and halo orbits.
+                </li>
+                <li>
+                    <strong>Physical assumptions:</strong>
+                    Sun and Earth dominate the gravity; JWST is treated as an infinitesimal mass
+                    \(M_3 \ll M_1, M_2\); the two primaries move on a circular orbit about their
+                    barycenter.
+                </li>
+                <li>
+                    <strong>Rotating barycentric frame:</strong>
+                    origin at the Sun–Earth barycenter, x-axis along the Sun–Earth line, frame
+                    rotates so the primaries and \(L_2\) stay fixed and the barycenter has zero
+                    acceleration.
+                </li>
+                <li>
+                    <strong>Non-dimensionalization:</strong>
+                    total mass scaled to 1, Sun–Earth distance scaled to 1, orbital period set to
+                    \(2\pi\); dynamics characterized by the mass parameter \(\mu\).
+                </li>
+                <li>
+                    <strong>Equations of motion:</strong>
+                    3D CR3BP ODEs include Coriolis terms (\(\pm 2\dot{y}, \pm 2\dot{x}\)) and
+                    gravitational terms from both primaries, capturing the halo-orbit dynamics
+                    near \(L_2\).
+                </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Simulations -->
+    <section id="simulations">
+      <div class="card wide section-card">
+        <h2>Simulations &amp; 3D Animation Gallery</h2>
+
+        <!-- Row 1: Fixed / inertial -->
+        <div class="split-row">
+          <div class="split-card">
+            <figure class="split-media">
+              <video
                 class="media"
-                src="../results/animation/jwst_pv_fixed.mp4"
+                src="../results/animation/jwst_ff.mp4"
                 autoplay
                 muted
                 loop
                 playsinline
-            ></video>
-            <figcaption class="caption">
-                <strong>3D PyVista Visualization (Fixed Frame)</strong> — A cinematic view of JWST near L2 with a starfield environment and moving camera. The animation shows Earth's orbit and the spacecraft's path in 3D, providing spatial context for the transfer and halo region.
-            </figcaption>
-        </figure>
-        
-        <!-- Row 1: Fixed/Inertial Frame — video LEFT, text RIGHT -->
-        <div class="split-row">
-        <div class="split-card">
-            <figure class="split-media">
-            <video
-                class="media"
-                src="../results/animation/jwst_ff.mp4"
-                autoplay muted loop playsinline
-            ></video>
-            <figcaption class="sr-only">
-                Transfer (Fixed/Inertial Frame) — JWST Earth→L₂ trajectory in the inertial frame.
-            </figcaption>
+              ></video>
+              <figcaption class="sr-only">
+                Transfer in fixed (inertial) frame.
+              </figcaption>
             </figure>
 
             <div class="split-copy">
-            <h3>Transfer (Fixed/Inertial Frame)</h3>
-            <p>
+                <h3>Transfer (Fixed/Inertial Frame)</h3>
+                <br/>
+                <p>
                 JWST's Earth→L₂ trajectory shown in the inertial frame, where both Earth's
                 revolution and the spacecraft's path are visible. This view highlights the
                 absolute geometry of the transfer relative to the Sun-Earth system.
-            </p>
+                </p>
             </div>
-        </div>
+          </div>
         </div>
 
-        <!-- Row 2: Rotating Frame — text LEFT, video RIGHT -->
+        <!-- Row 2: Rotating frame -->
         <div class="split-row alt">
-        <div class="split-card">
+          <div class="split-card">
             <div class="split-copy">
-            <h3>Transfer &amp; Halo Context (Rotating Frame)</h3>
-            <p>
-                JWST's trajectory rendered in the Sun-Earth rotating frame, centered near L₂.
-                With the bulk orbital motion removed, the approach to L₂ and halo dynamics
-                become clearer.
-            </p>
+                <h3>Transfer &amp; Halo Context (Rotating Frame)</h3>
+                <br/>
+                <p>
+                    JWST's trajectory rendered in the Sun-Earth rotating frame, centered near L₂.
+                    With the bulk orbital motion removed, the approach to L₂ and halo dynamics
+                    become clearer.
+                </p>
             </div>
 
             <figure class="split-media">
-            <video
+              <video
                 class="media"
                 src="../results/animation/jwst_rf.mp4"
-                autoplay muted loop playsinline
-            ></video>
-            <figcaption class="sr-only">
-                Rotating frame view centered near L₂, clarifying halo dynamics.
-            </figcaption>
+                autoplay
+                muted
+                loop
+                playsinline
+              ></video>
+              <figcaption class="sr-only">
+                Rotating-frame view near L2, showing halo motion.
+              </figcaption>
             </figure>
-        </div>
+          </div>
         </div>
 
+        <!-- PyVista videos (two side by side) -->
+        <br/> <br/>
+        <h2 class="pyvista-heading">A More Realistic View</h2>
+        <div class="split-row alt">
+            <div class="split-card">
+                <figure class="split-media">
+                    <video
+                    class="media"
+                    src="../results/animation/jwst_pv_fixed.mp4"
+                    autoplay
+                    muted
+                    loop
+                    playsinline
+                    ></video>
+                    <figcaption class="caption">
+                    <strong>JWST Orbit - Fixed Frame</strong> — Sun-centered view with Earth's orbit
+                    and the full halo trajectory.
+                    </figcaption>
+                </figure>
 
+                <figure class="split-media">
+                    <video
+                    class="media"
+                    src="../results/animation/leo_pv_fixed.mp4"
+                    autoplay
+                    muted
+                    loop
+                    playsinline
+                    ></video>
+                    <figcaption class="caption">
+                    <strong>JWST Orbit - Rotating Frame</strong> — L<sub>2</sub>-centered view that
+                    emphasizes the halo motion.
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
       </div>
-
     </section>
+
+    <!-- 4. Validation -->
+    <section id="validation">
+        <div class="card wide section-card">
+            <h2>Validation: Face, Behavior &amp; Analytical-Model Checks</h2>
+
+            <div class="validation-layout">
+            <!-- LEFT: description of all validation -->
+            <div class="validation-text">
+                <br/> <br/>
+                <h3>Face validation</h3>
+                <p>
+                    visually inspect the LEO-to-halo trajectory in the rotating frame.
+                    The 3D curve forms the expected tilted, eccentric loop around L<sub>2</sub>,
+                    matching published Sun–Earth halo-orbit geometry.
+                </p>
+                <br/> <br/>
+
+                <h3>Analytical-model validation</h3>
+                <p>
+                    compute the Jacobi constant along the trajectory and check
+                    <em>C(t) − C(0)</em>. The lower-right plot
+                    (<code>jacobi_drift.png</code>) shows deviations staying near
+                    machine precision, indicating a correct and stable CR3BP
+                    implementation.
+                </p>
+                <br/> <br/>
+
+                <h3>Behavior validation</h3>
+                <p> 
+                    monitor the distance from the spacecraft to L<sub>2</sub>.
+                    The upper-right plot (<code>halo_boundedness.png</code>)
+                    shows a bounded, periodic radius with no long-term drift, confirming
+                    that the simulated halo orbit remains stably trapped near L<sub>2</sub>.
+                </p>
+            </div>
+
+            <!-- RIGHT: two validation plots, stacked -->
+            <div class="validation-media">
+                <figure>
+                <img
+                    src="../results/validation/halo_boundedness.png"
+                    alt="Distance from the spacecraft to L2 over the simulated halo orbit"
+                    class="validation-image"
+                />
+                <figcaption class="caption">
+                    <strong>Halo Boundedness</strong> — distance to L<sub>2</sub> stays bounded and
+                    periodic over multiple halo cycles.
+                </figcaption>
+                </figure>
+
+                <figure>
+                <img
+                    src="../results/validation/jacobi_drift.png"
+                    alt="Jacobi constant drift over the simulated trajectory"
+                    class="validation-image"
+                />
+                <figcaption class="caption">
+                    <strong>Jacobi Constant Drift</strong> — <em>C(t) − C(0)</em> remains at the
+                    level of numerical roundoff, validating the CR3BP equations and integrator.
+                </figcaption>
+                </figure>
+            </div>
+            </div>
+        </div>
+    </section>
+
   </main>
 </body>
 </html>
