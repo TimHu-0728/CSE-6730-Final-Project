@@ -151,13 +151,13 @@ x_Earth = 0.97*TB.r_12*np.cos(TB.Omega*t)
 y_Earth = 0.97*TB.r_12*np.sin(TB.Omega*t)
 z_Earth = np.zeros_like(x_Earth)
 
-plotTraj.Animation_FF(
-    x_fixed,y_fixed,z_fixed,
-    x_Earth,y_Earth,z_Earth,
-    t,TB.r_12,
-    save_path=OUTPUT_DIR / "jwst_ff.mp4",
-    fps=30, dpi=200
-)
+#plotTraj.Animation_FF(
+#    x_fixed,y_fixed,z_fixed,
+#    x_Earth,y_Earth,z_Earth,
+#    t,TB.r_12,
+#    save_path=OUTPUT_DIR / "jwst_ff.mp4",
+#    fps=30, dpi=200
+#)
 
 jwstVisualizationFixed(
     x_fixed, y_fixed, z_fixed,
@@ -165,7 +165,7 @@ jwstVisualizationFixed(
     TB.r_12, number_of_years,
     jwstModelPath="./assets/models/JWST/scene.gltf",
     cubeMapPath='./assets/cubemaps/space',
-    save_movie=OUTPUT_DIR / "jwst_pv_fixed.mp4"
+    #save_movie=OUTPUT_DIR / "jwst_pv_fixed.mp4"
 )
 
 TB.JamesWebb.X0_LEO = np.array([

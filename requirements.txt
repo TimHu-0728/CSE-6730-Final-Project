@@ -1,5 +1,6 @@
 appnope==0.1.4
 asttokens==3.0.0
+casadi==3.7.2
 certifi==2025.10.5
 charset-normalizer==3.4.4
 comm==0.2.3

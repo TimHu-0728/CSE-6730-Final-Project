@@ -214,6 +214,11 @@ class ThreeBodySystem:
         Rz = Rot.from_euler('z',W * t,degrees=False)
         return Rz.apply(r)
 
+    @staticmethod
+    def FixedToRot(r, W, t):
+        Rz = Rot.from_euler('z', -W * t, degrees=False)
+        return Rz.apply(r)
+
     def Dimensionalize(self,outputs,time):
         x = self.r_12 * outputs['x']
         y = self.r_12 * outputs['y']
