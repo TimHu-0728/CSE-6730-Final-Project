@@ -62,39 +62,23 @@
               halo orbit.
             </p>
 
-            <br/>
+            <br/> <br/>
 
             <h2>Conceptual Model: Sun-Earth CR3BP</h2>
-            <ul class="keypoints">
-                <li>
-                    <strong>CR3BP abstraction:</strong>
-                    reduce the full N-body solar system to two massive primaries (Sun, Earth) and
-                    one massless spacecraft, while preserving Lagrange points and halo orbits.
-                </li>
-                <li>
-                    <strong>Physical assumptions:</strong>
-                    Sun and Earth dominate the gravity; JWST is treated as an infinitesimal mass
-                    \(M_3 \ll M_1, M_2\); the two primaries move on a circular orbit about their
-                    barycenter.
-                </li>
-                <li>
-                    <strong>Rotating barycentric frame:</strong>
-                    origin at the Sun–Earth barycenter, x-axis along the Sun–Earth line, frame
-                    rotates so the primaries and \(L_2\) stay fixed and the barycenter has zero
-                    acceleration.
-                </li>
-                <li>
-                    <strong>Non-dimensionalization:</strong>
-                    total mass scaled to 1, Sun–Earth distance scaled to 1, orbital period set to
-                    \(2\pi\); dynamics characterized by the mass parameter \(\mu\).
-                </li>
-                <li>
-                    <strong>Equations of motion:</strong>
-                    3D CR3BP ODEs include Coriolis terms (\(\pm 2\dot{y}, \pm 2\dot{x}\)) and
-                    gravitational terms from both primaries, capturing the halo-orbit dynamics
-                    near \(L_2\).
-                </li>
-            </ul>
+            <p>
+                We model the JWST spacecraft using the Sun-Earth Circular Restricted
+                Three-Body Problem (CR3BP), where the Sun and Earth are the only massive
+                bodies and the spacecraft has negligible mass. Within this framework we build
+                two components: a <strong>transfer-to-L<sub>2</sub></strong> model and a
+                <strong>halo-orbit-around-L<sub>2</sub></strong> model. For the transfer, we
+                start from an Earth-centered orbit and integrate the CR3BP equations forward
+                in an inertial frame so the trajectory naturally flows along an
+                unstable-manifold-like path into the L<sub>2</sub> region. For the halo
+                orbit, we use the same 3D CR3BP dynamics in the rotating barycentric frame,
+                with non-dimensional units (total mass = 1, Sun-Earth distance = 1, period =
+                2π) and a chosen mass parameter &mu;, to generate a bounded three-dimensional
+                loop around L<sub>2</sub>.
+            </p>
           </div>
         </div>
       </div>
