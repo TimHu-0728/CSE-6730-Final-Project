@@ -112,7 +112,7 @@ body {
 
 /* section titles centered */
 .section-card h2 {
-  margin-top: 0;
+  margin-top: 5px;
   margin-bottom: 20px;
   font-size: 30px;
   text-align: center;
@@ -305,14 +305,14 @@ body {
 }
 
 .validation-text h3 {
-  margin-top: 8px;
-  margin-bottom: 8px;
+  margin-top: 0px;
+  margin-bottom: 10px;
   font-size: 22px;
 }
 
 .validation-text p {
   margin-top: 8px;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
 }
 
 .validation-media {
