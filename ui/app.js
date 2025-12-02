@@ -1,9 +1,9 @@
 // ui/app.js
 (() => {
-  const pv = document.getElementById('pvVideo');
+  const pv = document.getElementById('pyvista-manual');
   if (!pv) return;
 
-  const setRate = () => { pv.playbackRate = 0.5; };
+  const setRate = () => { pv.playbackRate = 4; };
 
   pv.addEventListener('loadedmetadata', setRate);
   pv.addEventListener('play', setRate);
@@ -18,6 +18,9 @@
 (() => {
   // Ensure all videos try to play muted if autoplay is blocked
   document.querySelectorAll('video').forEach(v => {
+    if (v.id === 'pyvista-manual') {
+      return;
+    }
     const tryPlay = () => v.play().catch(() => { /* ignore */ });
     v.muted = true;               // required for autoplay
     v.addEventListener('loadedmetadata', tryPlay);
