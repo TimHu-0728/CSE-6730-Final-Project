@@ -238,7 +238,7 @@ def jwstVisualizationRot(
     earthTexture = pv.read_texture("./assets/textures/planets/earth.jpg")
 
     # pl.add_mesh(floor, color='white', style = 'wireframe', show_edges=True, opacity=0.5, label="XY Plane")
-    pl.add_mesh(earth, texture=earthTexture, smooth_shading=True, label='Earth')
+    pl.add_mesh(earth, texture=earthTexture, smooth_shading=True)
 
     pl.add_mesh(jwstOrbit, color='cyan', line_width=2, label='JWST Orbit')
     pl.add_mesh(starPoints, color='white', point_size=2, render_points_as_spheres=True)
@@ -254,7 +254,7 @@ def jwstVisualizationRot(
 
     pl.add_legend(bcolor=None, face=None, border=False)
     pl.add_text(
-        f"{title} ({number_of_years} Years) - Fixed Frame",    # <-- 修改点
+        f"{title} ({number_of_years} Years) - Rotating Frame",    # <-- 修改点
         position='upper_left',
         font_size=12,
         color='white'
@@ -299,34 +299,74 @@ def jwstVisualizationRot(
 
         pl.off_screen = True
         pl.window_size = window_size
+        
+        cam = pl.renderer.GetActiveCamera()
+        
+        initial_cam_pos = np.array([0.5, 0.5, 0.5])
+        cam.SetPosition(*initial_cam_pos)
+        cam.SetFocalPoint(x_Earth, y_Earth, z_Earth)
+        pl.camera.zoom(205.8) 
+        pl.renderer.ResetCameraClippingRange()
 
-        frame_ids = range(0, jwstSamples, max(1, step))
-        for k, frame in enumerate(frame_ids):
+        zoom_start = 333
+        zoom_end = 333 + 501
+        zoom_steps = zoom_end - zoom_start
+        target_pos_offset = np.array([-0.1, -0.1, -0.15])
+        prev_progress = 0
+
+        print(f"Rendering {jwstSamples} frames to {tmp_dir}...")
+
+        for frame in range(jwstSamples):
             callback(frame)
+            if zoom_start < frame < zoom_end:
+                t = (frame - zoom_start) / zoom_steps
+                
+                progress = t * t * (3 - 2 * t)
+                delta_p = progress - prev_progress
+                prev_progress = progress
+
+                cam.SetFocalPoint(x_Earth, y_Earth, z_Earth + 0.0052 * progress)
+
+                jwstAssembly.SetScale(0.000003 + progress * 0.00003)
+
+                new_pos = initial_cam_pos + (target_pos_offset * progress)
+                cam.SetPosition(*new_pos)
+
+                pl.camera.zoom(0.1 ** delta_p)
+
+            pl.renderer.ResetCameraClippingRange()
             pl.render()
             pl.screenshot(
-                filename=str(tmp_dir / f"frame_{k:06d}.png"),
+                filename=str(tmp_dir / f"frame_{frame:06d}.png"),
                 return_img=False,
                 window_size=window_size
             )
 
         pl.close()
 
+        print("Encoding video...")
         cmd = [
             "ffmpeg",
             "-y",
             "-framerate", str(framerate),
             "-i", str(tmp_dir / "frame_%06d.png"),
-            "-vcodec", "libx264",
-            "-pix_fmt", "yuv420p",
-            "-movflags", "+faststart",
+            "-c:v", "libx264",
+            "-pix_fmt", "yuv420p", 
+            "-crf", "18", 
+            "-movflags", "+faststart", 
             str(out)
         ]
-        subprocess.run(cmd, check=True)
-
-        for p in tmp_dir.glob("frame_*.png"):
-            p.unlink()
-        tmp_dir.rmdir()
+        
+        try:
+            subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            print(f"Movie saved to: {out}")
+        except subprocess.CalledProcessError as e:
+            print(f"FFmpeg failed: {e.stderr.decode()}")
+        finally:
+            # cleanup
+            for p in tmp_dir.glob("frame_*.png"):
+                p.unlink()
+            tmp_dir.rmdir()
     else:
         pl.camera.zoom(205.8)
         pl.show(interactive_update=True)

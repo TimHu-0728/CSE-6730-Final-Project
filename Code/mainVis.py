@@ -7,7 +7,9 @@ from scipy.spatial.transform import Rotation as Rot
 from usePyVista import * 
 import plotTraj
 from classes import *
+from pathlib import Path
 
+OUTPUT_DIR = Path("results/animation"); OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 # Instantiate Three body system and its compositions. 
 TB = ThreeBodySystem()
 
@@ -35,7 +37,7 @@ JWST_IO_Earthcentered = ct.nlsys(TB.JamesWebb.JWST_update_nondim_Earthcentered, 
 
 # Define time span
 LEO_years = 0.02
-HALO_years = 2
+HALO_years = 4
 timepts_year = 1000
 timepts1 = np.linspace(0, LEO_years*TB.year, int(timepts_year / 3))                             # Nondimensinal time points for LEO 
 # timepts2 = np.linspace(timepts1[-1], timepts1[-1] + TO_years*TB.year, TO_years*10)     # Nondimensinal time points for Transfer Orbit
@@ -103,5 +105,5 @@ jwstVisualizationRot(
     TB.r_12, number_of_years,
     jwstModelPath="./assets/models/JWST/scene.gltf",
     cubeMapPath='./assets/cubemaps/space',
-    #save_movie=OUTPUT_DIR / "jwst_pv_fixed.mp4"
+    save_movie=OUTPUT_DIR / "jwst_pv_rot.mp4"
 )
