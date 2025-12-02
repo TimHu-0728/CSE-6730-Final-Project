@@ -28,7 +28,7 @@ def jwstVisualizationFixed(
     save_movie=None,
     framerate=30,
     step=5,
-    window_size=(1280, 720),
+    window_size=(1920, 1080),
     title="JWST Orbit"         # <-- 唯一新增参数
 ):
     pv.global_theme.allow_empty_mesh = True
@@ -228,9 +228,9 @@ def jwstVisualizationRot(
     save_movie=None,
     framerate=30,
     step=5,
-    window_size=(1280, 720),
+    window_size=(1920, 1080),
     title="JWST Orbit",         # <-- 唯一新增参数
-    wobble_intensity = 0.001
+    wobble_intensity = 0.005
 
 ):
     pv.global_theme.allow_empty_mesh = True
