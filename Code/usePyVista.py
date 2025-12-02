@@ -287,7 +287,6 @@ def jwstVisualizationRot(
         jwstAssembly.SetPosition(x_JWST[frame] / r_12, y_JWST[frame] / r_12, z_JWST[frame] / r_12)
         jwstAssembly.SetOrientation(0, -pitch, yaw + 90)
    
-        pl.render()
 
     if save_movie:
         out = Path(save_movie)
@@ -297,15 +296,16 @@ def jwstVisualizationRot(
 
         assert shutil.which("ffmpeg"), "ffmpeg not found on PATH"
 
+        pl.camera.zoom(205.8) 
         pl.off_screen = True
         pl.window_size = window_size
-        
+        callback(0)
         cam = pl.renderer.GetActiveCamera()
         
         initial_cam_pos = np.array([0.5, 0.5, 0.5])
         cam.SetPosition(*initial_cam_pos)
         cam.SetFocalPoint(x_Earth, y_Earth, z_Earth)
-        pl.camera.zoom(205.8) 
+        pl.render() 
         pl.renderer.ResetCameraClippingRange()
 
         zoom_start = 333
@@ -333,6 +333,7 @@ def jwstVisualizationRot(
                 cam.SetPosition(*new_pos)
 
                 pl.camera.zoom(0.1 ** delta_p)
+                pl.update() 
 
             pl.renderer.ResetCameraClippingRange()
             pl.render()
@@ -405,6 +406,7 @@ def jwstVisualizationRot(
             pl.update() 
             
             pl.renderer.ResetCameraClippingRange()
+            pl.render()
             time.sleep(current_duration)
             
             frame += 1
