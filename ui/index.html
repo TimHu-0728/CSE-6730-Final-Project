@@ -49,35 +49,67 @@
 
           <!-- RIGHT: project paragraph + conceptual bullets -->
           <div class="project-overview-text">
-            <h2>Project Description</h2>
-            <p>
-              We simulate a JWST-like spacecraft operating near the Sun–Earth L<sub>2</sub>
-              Lagrange point using the Circular Restricted Three-Body Problem. Our project
-              builds an end-to-end pipeline: starting from an Earth parking orbit, we design
-              a transfer to the L<sub>2</sub> region and then propagate a three-dimensional
-              halo orbit in the rotating frame. We validate the dynamics using the Jacobi
-              constant and long-term bounded motion, and we visualize the results with 3D
-              animations in both inertial and rotating frames. The final interface lets
-              viewers quickly grasp how JWST can reach L<sub>2</sub> and maintain a stable
-              halo orbit.
-            </p>
 
-            <br/> <br/>
+            <h2>Project Description</h2>
+            <p class="project-description-intro">
+                We simulate a JWST-like spacecraft operating near the Sun-Earth L<sub>2</sub>
+                Lagrange point using the Circular Restricted Three-Body Problem. Our project
+                builds an end-to-end pipeline: starting from an Earth parking orbit, we design
+                a transfer to the L<sub>2</sub> region and then propagate a three-dimensional
+                halo orbit in the rotating frame. We validate the dynamics using the Jacobi
+                constant and long-term bounded motion, and we visualize the results with 3D
+                animations in both inertial and rotating frames. The final interface lets
+                viewers quickly grasp how JWST can reach L<sub>2</sub> and maintain a stable
+                halo orbit.
+            </p>
+            <br/>
 
             <h2>Conceptual Model: Sun-Earth CR3BP</h2>
             <p>
-                We model the JWST spacecraft using the Sun-Earth Circular Restricted
-                Three-Body Problem (CR3BP), where the Sun and Earth are the only massive
-                bodies and the spacecraft has negligible mass. Within this framework we build
-                two components: a <strong>transfer-to-L<sub>2</sub></strong> model and a
-                <strong>halo-orbit-around-L<sub>2</sub></strong> model. For the transfer, we
-                start from an Earth-centered orbit and integrate the CR3BP equations forward
-                in an inertial frame so the trajectory naturally flows along an
-                unstable-manifold-like path into the L<sub>2</sub> region. For the halo
-                orbit, we use the same 3D CR3BP dynamics in the rotating barycentric frame,
-                with non-dimensional units (total mass = 1, Sun-Earth distance = 1, period =
-                2π) and a chosen mass parameter &mu;, to generate a bounded three-dimensional
-                loop around L<sub>2</sub>.
+                We model JWST as a massless spacecraft moving under the gravity of the Sun and
+                Earth using the Sun-Earth Circular Restricted Three-Body Problem (CR3BP).
+                The two primaries move on circular orbits about their common center of mass,
+                and the spacecraft is described in a rotating barycentric frame where the Sun
+                and Earth are fixed on the \(x\)-axis. We follow the standard non-dimensional
+                CR3BP equations given in
+                <a href="https://orbital-mechanics.space/the-n-body-problem/circular-restricted-three-body-problem.html"
+                    target="_blank" rel="noopener noreferrer">
+                    Weber (2024)
+                </a>.
+            </p>
+
+            <p>
+                In this frame the state is
+                \(\mathbf{X} = [x, y, z, \dot{x}, \dot{y}, \dot{z}]^\top\), and the CR3BP
+                dynamics are
+            </p>
+
+            <p class="equations">
+                \[
+                \ddot{x} - 2\dot{y}
+                    = x - \frac{1-\mu}{\sigma^3}(x+\mu) - \frac{\mu}{\psi^3}(x-1+\mu),
+                \]
+                \[
+                \ddot{y} + 2\dot{x}
+                    = y - \frac{1-\mu}{\sigma^3}y - \frac{\mu}{\psi^3}y,
+                \]
+                \[
+                \ddot{z}
+                    = - \frac{1-\mu}{\sigma^3}z - \frac{\mu}{\psi^3}z,
+                \]
+                where
+                \(\sigma = \sqrt{(x+\mu)^2 + y^2 + z^2}\) and
+                \(\psi = \sqrt{(x-1+\mu)^2 + y^2 + z^2}\).
+            </p>
+
+            <p>
+                We integrate this 3D system to simulate two behaviors:
+                <ul>
+                    <li>a transfer trajectory from a near-Earth orbit to the vicinity of \(L_2\)</li>
+                    <li>a bounded halo orbit around \(L_2\) in the rotating frame.</li>
+                </ul>
+                The final simulation combines both parts, showing the full Earth-to-halo
+                trajectory.
             </p>
           </div>
         </div>
@@ -107,12 +139,11 @@
             </figure>
 
             <div class="split-copy">
-                <h3>Transfer (Fixed/Inertial Frame)</h3>
+                <h3>Fixed (Inertial) Frame</h3>
                 <br/>
                 <p>
-                JWST's Earth→L₂ trajectory shown in the inertial frame, where both Earth's
-                revolution and the spacecraft's path are visible. This view highlights the
-                absolute geometry of the transfer relative to the Sun-Earth system.
+                    Sun-centered view where Earth moves on its orbit and JWST's transfer path
+                    is shown in absolute space.
                 </p>
             </div>
           </div>
@@ -122,27 +153,19 @@
         <div class="split-row alt">
           <div class="split-card">
             <div class="split-copy">
-                <h3>Transfer &amp; Halo Context (Rotating Frame)</h3>
+                <h3>Rotating Frame</h3>
                 <br/>
                 <p>
-                    JWST's trajectory rendered in the Sun-Earth rotating frame, centered near L₂.
-                    With the bulk orbital motion removed, the approach to L₂ and halo dynamics
-                    become clearer.
+                    Co-rotating Sun-Earth view where the primaries stay fixed and the
+                    transfer and halo motion around L<sub>2</sub> become easier to see.
                 </p>
             </div>
 
             <figure class="split-media">
-              <!-- <video
-                class="media"
-                src="../results/animation/jwst_with_optimization_rotation_frame.mp4"
-                autoplay 
-                muted
-                loop
-                playsinline
-              ></video> -->
               <video
                 class="media"
                 src="../results/animation/jwst_with_optimization_rotation_frame.mp4"
+                autoplay 
                 muted
                 loop
                 playsinline
@@ -157,39 +180,17 @@
         <!-- PyVista videos (two side by side) -->
         <br/> <br/>
         <h2 class="pyvista-heading">A More Realistic View</h2>
-        <div class="split-row alt">
-            <div class="split-card">
-                <figure class="split-media">
-                    <video
-                    class="media"
-                    src="../results/animation/jwst_pv_fixed.mp4"
-                    autoplay
-                    muted
-                    loop
-                    playsinline
-                    ></video>
-                    <figcaption class="caption">
-                    <strong>JWST Orbit - Fixed Frame</strong> — Sun-centered view with Earth's orbit
-                    and the full halo trajectory.
-                    </figcaption>
-                </figure>
-
-                <figure class="split-media">
-                    <video
-                    class="media"
-                    src="../results/animation/leo_pv_fixed.mp4"
-                    autoplay
-                    muted
-                    loop
-                    playsinline
-                    ></video>
-                    <figcaption class="caption">
-                    <strong>JWST Orbit - Rotating Frame</strong> — L<sub>2</sub>-centered view that
-                    emphasizes the halo motion.
-                    </figcaption>
-                </figure>
-            </div>
-        </div>
+        <figure>
+            <video
+                id="pyvista-manual"
+                class="media"
+                src="../results/animation/jwst_pv_rot.mp4"
+                muted
+                loop
+                playsinline
+                controls
+            ></video>
+        </figure>
       </div>
     </section>
 

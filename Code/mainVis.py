@@ -99,11 +99,30 @@ t = np.concatenate((t_LEO,t_TO,t_Halo))
 
 number_of_years = 10
 
-jwstVisualizationRot(
-    x, y, z,
-    TB.Earth.x, 0, 0,
+# jwstVisualizationRot(
+#     x, y, z,
+#     TB.Earth.x, 0, 0,
+#     TB.r_12, number_of_years,
+#     jwstModelPath="./assets/models/JWST/scene.gltf",
+#     cubeMapPath='./assets/cubemaps/space',
+#     save_movie=OUTPUT_DIR / "jwst_pv_rot.mp4"
+# )
+
+
+XYZ = TB.RotToFixed(np.array([x_Halo,y_Halo,z_Halo]).T, TB.Omega, t_Halo)
+x_fixed = XYZ[:,0]
+y_fixed = XYZ[:,1]
+z_fixed = XYZ[:,2]
+
+x_Earth = 0.97*np.cos(TB.Omega*t_Halo)
+y_Earth = 0.97*np.sin(TB.Omega*t_Halo)
+z_Earth = np.zeros_like(x_Earth)
+
+jwstVisualizationFixed(
+    x_fixed, y_fixed, z_fixed,
+    x_Earth, y_Earth, z_Earth,
     TB.r_12, number_of_years,
     jwstModelPath="./assets/models/JWST/scene.gltf",
     cubeMapPath='./assets/cubemaps/space',
-    save_movie=OUTPUT_DIR / "jwst_pv_rot.mp4"
+    save_movie=OUTPUT_DIR / "jwst_pv_fixed.mp4"
 )
