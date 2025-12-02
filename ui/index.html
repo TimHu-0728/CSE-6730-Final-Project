@@ -225,11 +225,12 @@
 
                 <h3>Behavior validation</h3>
                 <p> 
-                    We monitor the distance from the spacecraft to L<sub>2</sub> to verify that
-                    the halo orbit remains bounded. The lower-right plot
-                    <strong>Halo Boundedness</strong> shows a periodic radius with no long-term
-                    growth or decay over multiple cycles, confirming that the simulated halo
-                    motion stays stably trapped near L<sub>2</sub>.
+                    We also monitor the distance from the spacecraft to L<sub>2</sub> over the
+                    entire scenario. The lower-right plot
+                    <strong>LEO + Transfer + Halo Orbit Boundedness Check</strong> shows a nearly
+                    constant radius in LEO, a sharp change during transfer, and then a bounded,
+                    periodic radius in the halo phase, confirming successful arrival at the
+                    L<sub>2</sub> region and stable long-term motion around it.
                 </p>
             </div>
 
@@ -237,25 +238,23 @@
             <div class="validation-media">
                 <figure>
                 <img
-                    src="../results/validation/jacobi_drift.png"
+                    src="../results/validation/halo_jacobi_drift.png"
                     alt="Jacobi constant drift over the simulated trajectory"
                     class="validation-image"
                 />
                 <figcaption class="caption">
-                    <strong>Jacobi Constant Drift</strong> — <em>C(t) − C(0)</em> remains at the
-                    level of numerical roundoff, validating the CR3BP equations and integrator.
+                    <strong>Jacobi Constant Drift</strong>
                 </figcaption>
                 </figure>
-
+                <br/>
                 <figure>
                 <img
-                    src="../results/validation/halo_boundedness.png"
+                    src="../results/validation/boundedness.png"
                     alt="Distance from the spacecraft to L2 over the simulated halo orbit"
                     class="validation-image"
                 />
                 <figcaption class="caption">
-                    <strong>Halo Boundedness</strong> — distance to L<sub>2</sub> stays bounded and
-                    periodic over multiple halo cycles.
+                    <strong>LEO + Transfer + Halo Orbit Boundedness Check</strong>
                 </figcaption>
                 </figure>
             </div>

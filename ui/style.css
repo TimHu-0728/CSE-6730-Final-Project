@@ -309,11 +309,10 @@ body {
 .validation-text h3 {
   margin-top: 0px;
   margin-bottom: 10px;
-  font-size: 22px;
+  font-size: 20px;
 }
 
 .validation-text p {
-  margin-top: 8px;
   margin-bottom: 30px;
   text-align: justify;
 }
