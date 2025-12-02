@@ -19,7 +19,7 @@ def compute_jacobi_constant(TB, x, y, z, xdot, ydot, zdot):
     C = 2 * Omega - (xdot**2 + ydot**2 + zdot**2)
     return C
 
-#   Jacobi Constant Validation
+#   Halo Jacobi Constant Validation
 def validate_jacobi(TB, outputs, time, save_dir="results/validation"):
     """
     Check if Jacobi constant stays nearly constant.
@@ -46,13 +46,13 @@ def validate_jacobi(TB, outputs, time, save_dir="results/validation"):
     plt.plot(time, C - C0, lw=1)
     plt.xlabel("Time (nondimensional)")
     plt.ylabel("C(t) - C(0)")
-    plt.title("Jacobi Constant Drift")
+    plt.title("Halo Orbit Jacobi Constant Drift")
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig(save_dir / "jacobi_drift.png", dpi=200)
+    plt.savefig(save_dir / "halo_jacobi_drift.png", dpi=200)
     plt.close()
 
-    print("\n===== Jacobi Constant Validation =====")
+    print("\n Jacobi Constant Validation")
     print(f"Initial Jacobi constant C0 = {C0:.6e}")
     print(f"Max relative drift ε_C = {eps_C:.3e}")
     print(f"Plot saved to  {save_dir/'jacobi_drift.png'}")
@@ -60,8 +60,8 @@ def validate_jacobi(TB, outputs, time, save_dir="results/validation"):
     return eps_C, C
 
 
-#   Halo Orbit Boundedness (Distance to L2)
-def validate_halo_boundedness(TB, x, y, z, save_dir="results/validation"):
+#   Orbit Boundedness (Distance to L2)
+def validate_boundedness(TB, x, y, z, save_dir="results/validation"):
     """
     Check if halo orbit stays in bounded region around L2.
     """
@@ -85,17 +85,17 @@ def validate_halo_boundedness(TB, x, y, z, save_dir="results/validation"):
     plt.axhline(r0, color='k', ls='--', lw=1, label="initial radius")
     plt.xlabel("Time index")
     plt.ylabel("Distance to L2 [km]")
-    plt.title("Halo Orbit Boundedness Check")
+    plt.title("Leo + Transfer + Halo Orbit Boundedness Check")
     plt.grid(True)
     plt.legend()
     plt.tight_layout()
-    plt.savefig(save_dir / "halo_boundedness.png", dpi=200)
+    plt.savefig(save_dir / "boundedness.png", dpi=200)
     plt.close()
 
-    print("\n===== Halo Orbit Boundedness Validation =====")
+    print("\n Leo + Transfer + Halo Boundedness Validation")
     print(f"r0       = {r0:.3e} km")
     print(f"r_min    = {r_min:.3e} km   →  {rel_min:.3f} r0")
     print(f"r_max    = {r_max:.3e} km   →  {rel_max:.3f} r0")
-    print(f"Plot saved to  {save_dir/'halo_boundedness.png'}")
+    print(f"Plot saved to  {save_dir/'boundedness.png'}")
 
     return (r_min, r_max, r0)

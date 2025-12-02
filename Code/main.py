@@ -4,9 +4,9 @@ import numpy as np
 import control as ct
 import control.optimal as opt
 from scipy.spatial.transform import Rotation as Rot
-import PlotTraj
-from Classes import *
-
+import plotTraj
+from classes import *
+from validation import validate_jacobi, validate_boundedness
 # Instantiate Three body system and its compositions. 
 TB = ThreeBodySystem()
 
@@ -48,7 +48,7 @@ output_LEO = TB.Earth_centered_inverse(output_LEO)
 x_LEO, y_LEO, z_LEO, xdot_LEO, ydot_LEO, zdot_LEO, t_LEO = TB.Dimensionalize(output_LEO,time_LEO)
 
 # Solve Optimal Control Problem for transfer orbit
-opt_data = load_optimization_result("Optimization_Result")
+opt_data = load_optimization_result("Code/Optimization_Result")
 T_guess = opt_data['T_opt']
 X_guess = opt_data['Xs']
 u_guess = opt_data['Us']
@@ -92,8 +92,8 @@ z = np.concatenate((z_LEO,z_TO,z_Halo))
 t = np.concatenate((t_LEO,t_TO,t_Halo))
 
 # Plot the JWST Trajectory
-# PlotTraj.Plot_static_RF(x,y,z,TB.r_12,TB.x_L2,TB.Earth.x)
-PlotTraj.Animation_RF(x,y,z,t,TB.r_12,TB.x_L2,TB.Earth.x)
+# plotTraj.Plot_static_RF(x,y,z,TB.r_12,TB.x_L2,TB.Earth.x)
+plotTraj.Animation_RF(x,y,z,t,TB.r_12,TB.x_L2,TB.Earth.x)
 
 # Transfer to Fixed Frame
 # XYZ = TB.RotToFixed(np.array([x,y,z]).T, TB.Omega, t)
@@ -104,18 +104,16 @@ PlotTraj.Animation_RF(x,y,z,t,TB.r_12,TB.x_L2,TB.Earth.x)
 # y_Earth = 0.97*TB.r_12*np.sin(TB.Omega*t)
 # z_Earth = np.zeros_like(x_Earth)
 
-# PlotTraj.Animation_FF(x_fixed,y_fixed,z_fixed,x_Earth,y_Earth,z_Earth,t,TB.r_12)
-
-from validation import validate_jacobi, validate_halo_boundedness
+# plotTraj.Animation_FF(x_fixed,y_fixed,z_fixed,x_Earth,y_Earth,z_Earth,t,TB.r_12)
 
 validate_jacobi(
     TB,
-    outputs,
-    time,
+    output_Halo,     # halo output dict
+    time_Halo,       # halo nondimensional time
     save_dir="results/validation"
 )
 
-validate_halo_boundedness(
+validate_boundedness(
     TB,
     x, y, z,
     save_dir="results/validation"
