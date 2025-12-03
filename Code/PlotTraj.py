@@ -10,9 +10,9 @@ def Animation_RF(x,y,z,t,r_12,x_L2,x_Earth):
   fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
   ax.axis('equal')
   Traj = ax.plot([], [], [], 'r-', label='Halo Orbit',lw=1)[0]
-  Head = ax.scatter([],[],[], c='tab:brown',marker='o',s=40,label='JWST')
+  Head = ax.scatter([],[],[], c='tab:brown',marker='o',s=1,label='JWST')
   ax.scatter(x_L2*r_12,0,0,c='tab:purple',marker='*',label='L_2',s=80)
-  ax.scatter(x_Earth*r_12,0,0,c='tab:blue',marker='o',label='Earth',s=150)
+  ax.scatter(x_Earth*r_12,0,0,c='tab:blue',marker='o',label='Earth',s=1)
   ax.set_title('JWST Trajectory in Rotating Frame')
   ax.set_xlabel('x')
   ax.set_ylabel('y')
@@ -32,21 +32,21 @@ def Animation_RF(x,y,z,t,r_12,x_L2,x_Earth):
   plt.show()
   
 
-# Plot the Earth with Halo Orbits Rotation frame
-def Plot_static_RF(x,y,z,t,r_12,x_L2,x_Earth):
+# Plot the Earth with Halo Orbits in Rotation frame
+def Plot_static_RF(x,y,z,r_12,x_L2,x_Earth):
   fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
   ax.axis('equal')
-  ax.set_title('JWST Trajectory in Rotating Frame (CR3BP)')
-  ax.set_xlabel('x')
-  ax.set_ylabel('y')
-  ax.set_zlabel('z')
+  ax.set_title('JWST Trajectory in Rotating Frame (CR3BP)',fontsize=20)
+  ax.set_xlabel('x',fontsize=20)
+  ax.set_ylabel('y',fontsize=20)
+  ax.set_zlabel('z',fontsize=20)
   ax.set_xlim([1.49e8,1.515e8])
   ax.set_ylim([-1.5e6,1.5e6])
   ax.set_zlim([-1e6,2e6])
   
-  ax.plot(x, y, z, 'r-', label='Halo Orbit',lw=1)
+  ax.plot(x, y, z, 'r-', label='JWST Orbit',lw=1)
   ax.scatter(x_L2*r_12,0,0,c='tab:brown',marker='*',label='L_2',s=30)
-  ax.scatter(x_Earth*r_12,0,0,c='tab:blue',marker='o',label='Earth',s=50)
+  ax.scatter(x_Earth*r_12,0,0,c='tab:blue',marker='o',label='Earth',s=1)
 
   plt.legend()
   # plt.savefig('Halo_Orbit.jpg')
@@ -83,4 +83,14 @@ def Animation_FF(x_JWST,y_JWST,z_JWST,x_Earth,y_Earth,z_Earth,t,r_12):
   # ani.save('Animation_Fixed_Frame.gif',writer=PillowWriter(fps=100))
   plt.show()
   
-  
+def Plot_u(u,t):
+  plt.figure()
+  labels = ['$u_x(t)$', '$u_y(t)$', '$u_z(t)$']
+  for i in range(3):
+      plt.step(t, u[:, i], where='post', label=labels[i])
+  plt.xlabel('t',fontsize=18)
+  plt.ylabel('u',fontsize=18)
+  plt.title('Optimal control u(t) in characteristic unit',fontsize=18)
+  plt.grid(True)
+  plt.legend(fontsize=18)
+  plt.show()
