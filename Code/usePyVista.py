@@ -10,6 +10,7 @@ from pathlib import Path
 
 vtk.vtkObject.GlobalWarningDisplayOff()
 logging.getLogger().setLevel(logging.CRITICAL)
+np.bool= np.bool_
 
 def get_wobble(frame, intensity):
     dx = np.sin(frame * 0.01) + np.sin(frame * 0.023) 

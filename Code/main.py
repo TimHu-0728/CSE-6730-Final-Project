@@ -2,11 +2,15 @@ from typing import Tuple
 from math import *
 import numpy as np
 import control as ct
-import control.optimal as opt
 from scipy.spatial.transform import Rotation as Rot
-import plotTraj
-from classes import *
+from pathlib import Path
+from usePyVista import * 
+from PlotTraj import *
+from Classes import *
 from validation import validate_jacobi, validate_boundedness
+
+OUTPUT_DIR = Path("results/animation"); OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+# repo_root = Path(__file__).resolve().parents[1]
 # Instantiate Three body system and its compositions. 
 TB = ThreeBodySystem()
 
@@ -91,9 +95,9 @@ z = np.concatenate((z_LEO,z_TO,z_Halo))
 t = np.concatenate((t_LEO,t_TO,t_Halo))
 
 # Plot the JWST Trajectory
-PlotTraj.Plot_static_RF(x,y,z,TB.r_12,TB.x_L2,TB.Earth.x)
-PlotTraj.Animation_RF(x,y,z,t,TB.r_12,TB.x_L2,TB.Earth.x)
-PlotTraj.Plot_u(u_opt.T,timepts2[:-1])
+Plot_static_RF(x,y,z,TB.r_12,TB.x_L2,TB.Earth.x)
+Animation_RF(x,y,z,t,TB.r_12,TB.x_L2,TB.Earth.x)
+Plot_u(u_opt.T,timepts2[:-1])
 # Transfer to Fixed Frame
 # XYZ = TB.RotToFixed(np.array([x,y,z]).T, TB.Omega, t)
 # x_fixed = XYZ[:,0]

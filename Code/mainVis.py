@@ -2,12 +2,12 @@ from typing import Tuple
 from math import *
 import numpy as np
 import control as ct
-import control.optimal as opt
 from scipy.spatial.transform import Rotation as Rot
 from usePyVista import * 
-import plotTraj
-from classes import *
+from PlotTraj import *
+from Classes import *
 from pathlib import Path
+
 
 OUTPUT_DIR = Path("results/animation"); OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 # Instantiate Three body system and its compositions. 
@@ -50,12 +50,19 @@ output_LEO = TB.Earth_centered_inverse(output_LEO)
 x_LEO, y_LEO, z_LEO, xdot_LEO, ydot_LEO, zdot_LEO, t_LEO = TB.Dimensionalize(output_LEO,time_LEO)
 
 # Solve Optimal Control Problem for transfer orbit
-opt_data = load_optimization_result("./Code/Optimization_Result")
+# resolve optimization file relative to this script (not cwd)
+repo_dir = Path(__file__).resolve().parent
+opt_path = repo_dir / "Optimization_Result" / "result_20251202_145613.npz"
+if not opt_path.exists():
+     raise FileNotFoundError(f"Optimization result not found: {opt_path}\n"
+                            "Place the file under Code/Optimization_Result or run from the Code directory.")
+opt_data = load_optimization_result(str(opt_path))
+
 T_guess = opt_data['T_opt']
 X_guess = opt_data['Xs']
 u_guess = opt_data['Us']
 
-if True:
+if False:
   X0_TO = TB.Earth_centered(output_LEO[:,-1])
   Xf_TO = TB.Earth_centered(TB.JamesWebb.X0_Halo)
   T_opt, X_opt, u_opt, J_opt = TB.JamesWebb.optimal_transfer_orbit(X0_TO,Xf_TO,X_guess,uf=[0,0,0],u_guess=u_guess,
