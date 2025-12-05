@@ -34,13 +34,21 @@ JWST_IO_Earthcentered = ct.nlsys(TB.JamesWebb.JWST_update_nondim_Earthcentered, 
                                 params={'pi_1':TB.pi_1,'pi_2':TB.pi_2})
 
 # Define time span
+# opt_data = load_optimization_result("Optimization_Result/result_20251128_002718.npz")
+opt_data = load_optimization_result("Optimization_Result/result_20251202_145613.npz")
+T_guess = opt_data['T_opt']
+X_guess = opt_data['Xs']
+u_guess = opt_data['Us']
+
+
 LEO_years = 1
+TO_years = T_guess
 HALO_years = 10
 timepts_year = 1000
 timepts1 = np.linspace(0, LEO_years*TB.year, LEO_years*timepts_year)                             # Nondimensinal time points for LEO 
-# timepts2 = np.linspace(timepts1[-1], timepts1[-1] + TO_years*TB.year, TO_years*10)     # Nondimensinal time points for Transfer Orbit
-# timepts3 = np.linspace(timepts2[-1], timepts2[-1] + HALO_years*TB.year, HALO_years*timepts_year) # Nondimensinal time points for Halo Orbit
-timepts3 = np.linspace(0, HALO_years*TB.year, HALO_years*timepts_year) # Nondimensinal time points for Halo Orbit
+timepts2 = np.linspace(timepts1[-1], timepts1[-1] + TO_years*TB.year, 601)     # Nondimensinal time points for Transfer Orbit
+timepts3 = np.linspace(timepts2[-1], timepts2[-1] + HALO_years*TB.year, HALO_years*timepts_year) # Nondimensinal time points for Halo Orbit
+# timepts3 = np.linspace(0, HALO_years*TB.year, HALO_years*timepts_year) # Nondimensinal time points for Halo Orbit
 
 # Simulation of a LEO 
 time_LEO, output_LEO, input_LEO = TB.JamesWebb.JWST_propagate(JWST_IO_Earthcentered,TB.Earth_centered(TB.JamesWebb.X0_LEO),timepts=timepts1)
@@ -48,29 +56,26 @@ output_LEO = TB.Earth_centered_inverse(output_LEO)
 x_LEO, y_LEO, z_LEO, xdot_LEO, ydot_LEO, zdot_LEO, t_LEO = TB.Dimensionalize(output_LEO,time_LEO)
 
 # Solve Optimal Control Problem for transfer orbit
-opt_data = load_optimization_result("Code/Optimization_Result")
-T_guess = opt_data['T_opt']
-X_guess = opt_data['Xs']
-u_guess = opt_data['Us']
 
+# True if solving optimal control problem using CasADi to find Transfer Orbit, False to load existing solution
 if False:
   X0_TO = TB.Earth_centered(output_LEO[:,-1])
   Xf_TO = TB.Earth_centered(TB.JamesWebb.X0_Halo)
-  T_opt, X_opt, u_opt, J_opt = TB.JamesWebb.optimal_transfer_orbit(X0_TO,Xf_TO,X_guess,uf=[0,0,0],u_guess=u_guess,
+  T_opt, X_opt, u_opt, J_opt = TB.JamesWebb.optimal_transfer_orbit(X0_TO,Xf_TO,X_guess,uf=[0,0,0],u_guess=u_guess,T_guess=T_guess,
                                                             N=600, params={'pi_1':TB.pi_1,'pi_2':TB.pi_2},
                                                             Q=np.diag([10.,10.,10.,1.,1.,1.]),
-                                                            R=np.diag([2.,2.,2.]),
+                                                            R=np.diag([1.,1.,1.]),
                                                             Qf=np.diag([1e2,1e2,1e2,1e2,1e2,1e2]),
                                                             Rf=np.diag([1.,1.,1.]),
-                                                            beta = 10.0,
-                                                            opt_max_iter = 10000,
+                                                            beta = 20.,
+                                                            opt_max_iter = 500,
                                                             save_result=True)
 else:
   T_opt = T_guess
   X_opt = X_guess
   u_opt = u_guess
 
-x_TO, y_TO, z_TO, xdot_TO, ydot_TO, zdot_TO, t_TO = TB.Dimensionalize(TB.Earth_centered_inverse(X_opt))
+x_TO, y_TO, z_TO, xdot_TO, ydot_TO, zdot_TO, t_TO = TB.Dimensionalize(TB.Earth_centered_inverse(X_opt),time=timepts2)
 
 # Simulation of Halo Orbit
 time_Halo, output_Halo, input_Halo = TB.JamesWebb.JWST_propagate(JWST_IO_Earthcentered,TB.Earth_centered(TB.JamesWebb.X0_Halo),timepts=timepts3)
@@ -78,23 +83,17 @@ time_Halo, output_Halo, input_Halo = TB.JamesWebb.JWST_propagate(JWST_IO_Earthce
 output_Halo = TB.Earth_centered_inverse(output_Halo)
 x_Halo, y_Halo, z_Halo, xdot_Halo, ydot_Halo, zdot_Halo, t_Halo = TB.Dimensionalize(output_Halo,time_Halo)
 
-# Build a proper time vector for the TO so it matches the states
-t_TO = np.linspace(
-    t_LEO[-1],                   # start right after LEO ends
-    t_LEO[-1] + T_opt*TB.year,   # end after T_opt years (dimensional)
-    len(x_TO)
-)
-
 # Merge the Orbits
 x = np.concatenate((x_LEO,x_TO,x_Halo))
 y = np.concatenate((y_LEO,y_TO,y_Halo))
 z = np.concatenate((z_LEO,z_TO,z_Halo))
+
 t = np.concatenate((t_LEO,t_TO,t_Halo))
 
 # Plot the JWST Trajectory
-# plotTraj.Plot_static_RF(x,y,z,TB.r_12,TB.x_L2,TB.Earth.x)
-plotTraj.Animation_RF(x,y,z,t,TB.r_12,TB.x_L2,TB.Earth.x)
-
+PlotTraj.Plot_static_RF(x,y,z,TB.r_12,TB.x_L2,TB.Earth.x)
+PlotTraj.Animation_RF(x,y,z,t,TB.r_12,TB.x_L2,TB.Earth.x)
+PlotTraj.Plot_u(u_opt.T,timepts2[:-1])
 # Transfer to Fixed Frame
 # XYZ = TB.RotToFixed(np.array([x,y,z]).T, TB.Omega, t)
 # x_fixed = XYZ[:,0]

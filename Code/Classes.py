@@ -83,6 +83,7 @@ class JWST:
   
   
   # Solving trajectory optimization proble using CasADi (direct multiple shooting method)
+  def optimal_transfer_orbit(self,X0,Xf,X_guess,u0=None,uf=None,u_guess=None,T_guess = None,
                              N=200,params=None,
                              Q=np.diag([1.,1.,1.,0.1,0.1,0.1]),
                              R=np.diag([1.,1.,1.]),
@@ -147,6 +148,7 @@ class JWST:
     w += [T]
     lbw += [0.1]
     ubw += [20.0]
+    w0 += [T_guess]
 
     # Initial state constraint
     Xk = ca.MX.sym('X0',6)
@@ -161,6 +163,8 @@ class JWST:
         # Define New input variables and constraint
         Uk = ca.MX.sym('U_' + str(k),3)
         w += [Uk]
+        lbw += [-0.1]*3
+        ubw += [0.1]*3
         if u_guess is None:
           w0 += [0.0,0.0,0.0]
         else:
@@ -254,6 +258,7 @@ class ThreeBodySystem:
                m_Sun:float = 1.98847e30,
                m_Earth:float = 5.9722e24,
                m_JWST:float = 6500,
+               Period:float = 31556926,           # Seconds per year [s] 
                r_12:float = 1.49597871e8):          # Earth-Sun mean distance [km]
     self.G = 6.674e-20                            # Gravitational constant [km^3/kg/s^2]
     self.m_Sun = m_Sun
@@ -355,6 +360,7 @@ def load_optimization_result(path_or_folder):
     if not p.exists():
         raise FileNotFoundError(f"File not found: {p}")
     data = np.load(p, allow_pickle=True)
+
     return {'T_opt': float(data['T_opt'].item() if hasattr(data['T_opt'], 'item') else data['T_opt']),
             # 'J_opt': float(data['J_opt'].item() if hasattr(data['J_opt'], 'item') else data['J_opt']),
             'Xs': data['Xs'],
